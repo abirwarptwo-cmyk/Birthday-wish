@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Primary Meta Tags -->
+    <title>PARTY MISSIONS! 🎂✨</title>
+    <meta name="title" content="PARTY MISSIONS! 🎂✨">
+    <meta name="description" content="Complete 3 secret missions to unlock a special birthday surprise! 🎈🎁">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-website-link.com/"> 
+    <meta property="og:title" content="PARTY MISSIONS! 🎂✨">
+    <meta property="og:description" content="Complete 3 secret missions to unlock a special birthday surprise! 🎈🎁">
+    <meta property="og:image" content="https://i.postimg.cc/FKFr2JSb/1000128308.jpg"> 
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="PARTY MISSIONS! 🎂✨">
+    <meta property="twitter:description" content="Complete 3 secret missions to unlock a special birthday surprise! 🎈🎁">
+    <meta property="twitter:image" content="https://i.postimg.cc/FKFr2JSb/1000128308.jpg"> 
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@700&family=Bungee&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --pink: #ff007f;
+            --yellow: #ffeb3b;
+            --blue: #00e5ff;
+            --purple: #7000ff;
+            --white: #ffffff;
+            --black: #000000;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100vh; width: 100vw;
+            font-family: 'Bungee', cursive;
+            background: #000;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* --- BACKGROUNDS --- */
+        .bg-pattern {
+            position: fixed; inset: 0;
+            background: linear-gradient(45deg, var(--pink), var(--purple), var(--blue), var(--yellow));
+            background-size: 400% 400%;
+            animation: moveGradient 10s infinite alternate;
+            opacity: 0.8; z-index: -2;
+        }
+        @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+        .grid-overlay {
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px);
+            background-size: 30px 30px; z-index: -1;
+        }
+
+        /* --- STAGES --- */
+        .stage {
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; z-index: 10; padding: 20px;
+        }
+        .stage.active { display: flex; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* --- TEXT STYLES --- */
+        .hey-text {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(3rem, 15vw, 8rem);
+            color: #fff;
+            text-shadow: 5px 5px 0px var(--pink), 10px 10px 0px var(--purple);
+            margin: 0;
+        }
+
+        .task-title {
+            color: var(--yellow); font-size: 1.5rem;
+            background: #000; padding: 5px 15px;
+            margin-bottom: 20px; border: 3px solid var(--white);
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background: var(--yellow); color: #000;
+            padding: 15px 30px; font-size: 1.5rem;
+            border: 4px solid #000; box-shadow: 6px 6px 0px #000;
+            cursor: pointer; margin: 10px;
+        }
+        .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #000; }
+
+        /* --- BOMB STYLES --- */
+        .bomb-timer {
+            font-size: 8rem;
+            color: var(--white);
+            text-shadow: 0 0 20px var(--pink);
+            animation: pulse 0.5s infinite alternate;
+        }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        
+        .bomb-emoji { font-size: 5rem; margin-bottom: 20px; }
+
+        /* --- TYPEWRITER & GIFS --- */
+        .typewriter-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--blue);
+            padding: 20px; border-radius: 15px;
+            max-width: 90vw; color: var(--white);
+            font-family: 'Courier New', monospace;
+            text-align: left; font-size: 0.9rem;
+            margin: 15px 0;
+        }
+        .reveal-gif { width: 180px; height: auto; border-radius: 15px; margin-bottom: 10px; border: 3px solid #fff; }
+
+        /* --- MISSIONS RECAP --- */
+        #scratch-container { position: relative; width: 280px; height: 180px; background: #fff; border: 5px solid #000; border-radius: 10px; }
+        #scratch-canvas { position: absolute; inset: 0; z-index: 2; touch-action: none; }
+        .balloon-wrapper { position: absolute; z-index: 50; animation: floatUp 5s infinite ease-in-out; }
+        .balloon-body { width: 75px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8) 0%, var(--color) 60%); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .balloon-string { width: 2px; height: 80px; background: rgba(255,255,255,0.4); position: absolute; left: 50%; top: 95px; }
+        @keyframes floatUp { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+        .tap-box { font-size: 6rem; transition: transform 0.1s; }
+        .progress-bar { width: 250px; height: 30px; border: 4px solid #000; background: #fff; margin-top: 20px; position: relative; }
+        #progress-fill { height: 100%; width: 0%; background: var(--pink); transition: width 0.2s; }
+
+        /* --- UTILS --- */
+        .heavy-shake { animation: heavyShake 0.1s infinite; }
+        @keyframes heavyShake { 0% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -5px); } 100% { transform: translate(5px, -5px); } }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- STAGE 1: INTRO -->
+    <div id="intro" class="stage active">
+        <h1 class="hey-text">HEY YOU!</h1>
+        <p class="task-title">YOU HAVE 3 MISSIONS!</p>
+        <button class="btn" onclick="nextStage('stage-scratch')">I'M READY! 🔥</button>
+        <button class="btn" id="noBtn" onmouseover="dodgeNo()" onclick="dodgeNo()">NOPE</button>
+    </div>
+
+    <!-- STAGE 2: SCRATCH -->
+    <div id="stage-scratch" class="stage">
+        <p class="task-title">MISSION 1: SCRATCH IT!</p>
+        <div id="scratch-container">
+            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Caveat'; font-size: 1.8rem; color: var(--pink); padding: 10px; text-align: center;">You are the most amazing girl ever! 💖</div>
+            <canvas id="scratch-canvas"></canvas>
+        </div>
+        <button class="btn" id="scratch-btn" style="display:none;" onclick="nextStage('stage-balloons')">MISSION 2 ➡️</button>
+    </div>
+
+    <!-- STAGE 3: BALLOONS -->
+    <div id="stage-balloons" class="stage">
+        <p class="task-title">MISSION 2: POP 10 BALLOONS!</p>
+        <div id="balloon-count" style="font-size: 2rem; color: #fff; margin-bottom: 20px;">0 / 10</div>
+        <div id="balloon-area" style="width: 100%; height: 50vh; position: relative;"></div>
+    </div>
+
+    <!-- STAGE 4: TAP -->
+    <div id="stage-tap" class="stage">
+        <p class="task-title">MISSION 3: CHARGE THE GIFT!</p>
+        <div class="tap-box" id="tap-gift" onclick="handleTap()">🎁</div>
+        <div class="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+        <p style="color: white; margin-top: 10px;">TAP REPEATEDLY!</p>
+    </div>
+
+    <!-- STAGE 5: FINALE -->
+    <div id="final-surprise" class="stage">
+        <div style="display: flex; gap: 10px;">
+            <div style="border: 3px solid #fff; background: #fff; padding: 5px; transform: rotate(-5deg); width: 140px;">
+                <img src="https://i.postimg.cc/vZyCNts7/IMG-20260301-WA0005.jpg" style="width: 100%;">
+            </div>
+            <div style="border: 3px solid #fff; background: #fff; padding: 5px; transform: rotate(5deg); width: 160px;">
+                <img src="https://i.postimg.cc/W4jY5N0m/IMG-20260301-WA0003.jpg" style="width: 100%;">
+            </div>
+        </div>
+        <h1 class="hey-text" style="font-size: 3.5rem; margin-top: 20px;">HAPPY BIRTHDAY!</h1>
+        <button class="btn" onclick="nextStage('replay-gate')">REPLAY! 🚀</button>
+        <button class="btn" style="background: #000; color: var(--blue); border: 2px solid var(--blue);" onclick="nextStage('secret-gate')">🔒 TOP SECRET</button>
+    </div>
+
+    <!-- STAGE 6: REPLAY GATE -->
+    <div id="replay-gate" class="stage">
+        <h1 style="color: white;">WANT ANOTHER REPLAY? 😏</h1>
+        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW4yeHB6cnluMXduNnFsOTExdHozem16YzMwaDRscW5yN3Y3ZWR1NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/91BCkba1STSmzb4UWK/giphy.gif" class="reveal-gif">
+        <div style="display: flex;">
+            <button class="btn" onclick="startBomb()">YES ✅</button>
+            <button class="btn" onclick="nextStage('replay-no-insult')">NO ❌</button>
+        </div>
+    </div>
+
+    <!-- STAGE 7: REPLAY NO (INSULT) -->
+    <div id="replay-no-insult" class="stage">
+        <h2 style="color: var(--pink); background: #000; padding: 10px;">HOW DARE YOU NOT TO SEE THIS AGAIN !!!</h2>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ0Z3kzeXF0Z3Z4bmZ0Z3kzeXF0Z3Z4bmZ0Z3kzeXF0Z3Z4bmZ0ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L95W4wv8nnb9K/giphy.gif" class="reveal-gif">
+        <p style="color: white;">BOMB STARTING ANYWAY...</p>
+        <button class="btn" onclick="startBomb()">OKAY SORRY 😭</button>
+    </div>
+
+    <!-- STAGE 8: THE BOMB -->
+    <div id="bomb-stage" class="stage">
+        <div class="bomb-emoji">💣</div>
+        <div class="bomb-timer" id="bomb-clock">5</div>
+        <p class="task-title">SYSTEM EXPLODING...</p>
+    </div>
+
+    <!-- STAGE 9: TOP SECRET GATE -->
+    <div id="secret-gate" class="stage">
+        <p class="task-title">DOES SHAOJA GIVE PERMISSION?</p>
+        <div style="display: flex;">
+            <button class="btn" onclick="gateResponse('YES')">YES ✅</button>
+            <button class="btn" onclick="gateResponse('NO')">NO ❌</button>
+        </div>
+    </div>
+
+    <!-- STAGE 10: SECRET REVEAL -->
+    <div id="secret-reveal" class="stage">
+        <h2 id="gate-msg" style="color: var(--blue);"></h2>
+        <img id="gif-yes" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2M0N3c0YmZrY2plaWhld3hiNGo2bHUybjJvZmFkZ2Z4MGlrazAyNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/sRKg9r2YWeCTG5JTTo/giphy.gif" class="reveal-gif" style="display: none;">
+        <img id="gif-no" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGp3M3ZkZWNieG8xeDJpbXh3Y293d3pucXB5eDIyd244bW1sbjA3dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fVa2FK77jTgv4RMCtT/giphy.gif" class="reveal-gif" style="display: none;">
+        
+        <div class="typewriter-box" id="typewriter"></div>
+
+        <h3 style="color: var(--yellow); margin-top: 15px; font-size: 1.2rem; text-decoration: underline;">MY PROFILES</h3>
+        <div style="display:flex; gap:25px; font-size:2.5rem; margin-top:10px;">
+            <a href="https://wa.me/8801919069898" target="_blank" style="color:#25D366;"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.facebook.com/share/18CRpj3WHp/" target="_blank" style="color:#1877F2;"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/rm_abir71" target="_blank" style="color:#E4405F;"><i class="fab fa-instagram"></i></a>
+        </div>
+
+        <button class="btn" style="font-size: 1rem; margin-top: 20px;" onclick="nextStage('final-surprise')">⬅️ BACK</button>
+    </div>
+
+    <script>
+        let popCount = 0; let taps = 0;
+
+        function nextStage(id) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'stage-scratch') initScratch();
+            if(id === 'stage-balloons') initBalloons();
+        }
+
+        // --- BOMB LOGIC ---
+        function startBomb() {
+            nextStage('bomb-stage');
+            let timeLeft = 5;
+            const clock = document.getElementById('bomb-clock');
+            const timer = setInterval(() => {
+                timeLeft--;
+                clock.innerText = timeLeft;
+                if(timeLeft <= 2) document.body.classList.add('heavy-shake');
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    explodeAndReset();
+                }
+            }, 1000);
+        }
+
+        function explodeAndReset() {
+            confetti({ particleCount: 500, spread: 200, origin: { y: 0.5 } });
+            setTimeout(() => {
+                document.body.classList.remove('heavy-shake');
+                popCount = 0; taps = 0; 
+                nextStage('intro');
+            }, 1000);
+        }
+
+        // --- GATE LOGIC ---
+        function gateResponse(answer) {
+            const gifYes = document.getElementById('gif-yes');
+            const gifNo = document.getElementById('gif-no');
+            document.getElementById('gate-msg').innerText = answer === 'YES' ? "CHALOOOOOO!!! 🏃‍♂️💨" : "NO PROBLEM YOU CAN SEE 😉";
+            gifYes.style.display = answer === 'YES' ? 'block' : 'none';
+            gifNo.style.display = answer === 'NO' ? 'block' : 'none';
+            nextStage('secret-reveal');
+            typeWriter();
+        }
+
+        function typeWriter() {
+            const text = "SALAM ! AMI ABIR , SHAOJAR COUSIN. BHABLAM ETTO KOSHTO KORE JEHETU APNR JONNO WEBSITE TA BANACCHI SO AMI PORDAR ARALE THEKE GELE KEMON DEKHAY NA ? AMR POKHO THEKEO APNKE VERY VERY HAPPY BIRTHDAY, IF YOU WANNA THANK ME THAN HERE I'M";
+            let i = 0; const target = document.getElementById('typewriter');
+            target.innerHTML = "";
+            const interval = setInterval(() => {
+                target.innerHTML += text.charAt(i); i++;
+                if (i >= text.length) clearInterval(interval);
+            }, 40)
+        }
+
+        // --- GAME MISSIONS ---
+        function initScratch() {
+            const canvas = document.getElementById('scratch-canvas'); const ctx = canvas.getContext('2d');
+            canvas.width = 280; canvas.height = 180;
+            ctx.fillStyle = '#C0C0C0'; ctx.fillRect(0,0,280,180);
+            const scratch = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x,y,25,0,Math.PI*2); ctx.fill();
+                if(ctx.getImageData(0,0,280,180).data.filter((_,i)=>i%4===3 && _>0).length < 20000) document.getElementById('scratch-btn').style.display='block';
+            };
+            canvas.addEventListener('touchmove', scratch); canvas.addEventListener('mousemove', scratch);
+        }
+
+        function initBalloons() {
+            const area = document.getElementById('balloon-area'); area.innerHTML = ""; popCount = 0;
+            const colors = ['#ff007f', '#00e5ff', '#ffeb3b', '#7000ff'];
+            for(let i=0; i<15; i++) {
+                const b = document.createElement('div'); b.className = 'balloon-wrapper';
+                const color = colors[i%4]; b.style.setProperty('--color', color);
+                b.style.left = Math.random()*80+5+'vw'; b.style.top = Math.random()*40+5+'vh';
+                b.innerHTML = `<div class="balloon-body">🎈</div><div class="balloon-string"></div>`;
+                
+                b.onclick = () => { 
+                    // Confetti on every pop
+                    confetti({
+                        particleCount: 25,
+                        spread: 60,
+                        origin: { x: 0.5, y: 0.5 },
+                        colors: [color, '#ffffff']
+                    });
+
+                    b.remove(); 
+                    popCount++; 
+                    document.getElementById('balloon-count').innerText = `${popCount}/10`; 
+                    
+                    if(popCount === 10) {
+                        // Big confetti for completing mission
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        setTimeout(() => nextStage('stage-tap'), 800);
+                    }
+                };
+                area.appendChild(b);
+            }
+        }
+
+        function handleTap() {
+            taps++; document.getElementById('tap-gift').style.transform = `scale(${1+taps/10}) rotate(${taps%2?5:-5}deg)`;
+            document.getElementById('progress-fill').style.width = taps*10+'%';
+            if(taps>=10) { confetti({particleCount:200}); setTimeout(()=>nextStage('final-surprise'),500); }
+        }
+
+        function dodgeNo() {
+            const btn = document.getElementById('noBtn');
+            btn.style.position = 'fixed'; btn.style.left = Math.random()*70+'%'; btn.style.top = Math.random()*80+'%';
+        }
+    </script>
+</body>
+</html>
